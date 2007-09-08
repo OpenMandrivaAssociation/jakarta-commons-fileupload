@@ -7,7 +7,7 @@
 
 Name:           %{name}
 Version:        %{version}
-Release:        %mkrel 5.2
+Release:        %mkrel 5.3
 Summary:        Jakarta Commons Fileupload Package
 License:        Apache License
 Group:          Development/Java
