@@ -7,7 +7,7 @@
 
 Name:           %{name}
 Version:        %{version}
-Release:        %mkrel 5.3
+Release:        %mkrel 5.4
 Summary:        Jakarta Commons Fileupload Package
 License:        Apache License
 Group:          Development/Java
@@ -26,8 +26,6 @@ BuildRequires:  servlet24
 BuildRequires:  servletapi5-javadoc
 Requires:       servletapi5
 %if %{gcj_support}
-Requires(post):	java-gcj-compat
-Requires(postun): java-gcj-compat
 BuildRequires:	java-gcj-compat
 %else
 BuildArch:      noarch
