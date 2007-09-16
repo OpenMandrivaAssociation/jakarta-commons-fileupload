@@ -7,7 +7,7 @@
 
 Name:           %{name}
 Version:        %{version}
-Release:        %mkrel 5.4
+Release:        %mkrel 5.5
 Summary:        Jakarta Commons Fileupload Package
 License:        Apache License
 Group:          Development/Java
@@ -99,10 +99,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %if %{gcj_support}
 %post
-%{_bindir}/rebuild-gcj-db
+%{update_gcjdb}
 
 %postun
-%{_bindir}/rebuild-gcj-db
+%{clean_gcjdb}
 %endif
 
 %post javadoc
