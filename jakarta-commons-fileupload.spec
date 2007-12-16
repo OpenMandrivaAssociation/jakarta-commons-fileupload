@@ -7,7 +7,7 @@
 
 Name:           %{name}
 Version:        %{version}
-Release:        %mkrel 5.5
+Release:        %mkrel 5.6
 Summary:        Jakarta Commons Fileupload Package
 License:        Apache License
 Group:          Development/Java
@@ -18,7 +18,7 @@ Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/com
 Patch0:         %{name}-crosslink.patch
 Patch1:         %{name}-servletapi5.patch
 URL:            http://jakarta.apache.org/commons/fileupload/
-BuildRequires:  jpackage-utils >= 0:1.5
+BuildRequires:  java-rpmbuild >= 0:1.5
 BuildRequires:  ant
 BuildRequires:  ant-junit
 BuildRequires:  junit >= 0:3.8.1
