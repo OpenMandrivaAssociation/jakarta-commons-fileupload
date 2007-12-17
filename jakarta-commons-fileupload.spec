@@ -30,7 +30,6 @@ BuildRequires:	java-gcj-compat
 %else
 BuildArch:      noarch
 %endif
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Provides:       %{short_name}
 Obsoletes:      %{short_name}
 
