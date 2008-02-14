@@ -11,6 +11,7 @@ Release:        %mkrel 5.6
 Summary:        Jakarta Commons Fileupload Package
 License:        Apache License
 Group:          Development/Java
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 #Vendor:         JPackage Project
 #Distribution:   JPackage
 Epoch:          1
