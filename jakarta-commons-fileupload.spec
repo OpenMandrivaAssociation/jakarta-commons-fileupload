@@ -1,36 +1,66 @@
-%define gcj_support	1
-%define base_name       fileupload
-%define short_name      commons-%{base_name}
-%define name            jakarta-%{short_name}
-%define version         1.0
-%define section         free
+# Copyright (c) 2000-2005, JPackage Project
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the
+#    distribution.
+# 3. Neither the name of the JPackage Project nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-Name:           %{name}
-Version:        %{version}
-Release:        %mkrel 5.6
-Summary:        Jakarta Commons Fileupload Package
-License:        Apache License
-Group:          Development/Java
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-#Vendor:         JPackage Project
-#Distribution:   JPackage
+%define gcj_support	1
+%define base_name fileupload
+%define short_name commons-%{base_name}
+%define section free
+
+Name:           jakarta-%{short_name}
 Epoch:          1
-Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-%{version}-src.tar.bz2
-Patch0:         %{name}-crosslink.patch
-Patch1:         %{name}-servletapi5.patch
+Version:        1.1.1
+Release:        %mkrel 3.0.1
+Summary:        Jakarta Commons Fileupload Package
+
+Group:          Development/Java
+License:        Apache License
 URL:            http://jakarta.apache.org/commons/fileupload/
+Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-1.1.1-src.tar.gz
+Patch0:         %{name}-build_xml.patch
+Patch1:         %{name}-%{version}-servletapi5.patch
+
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
+
 BuildRequires:  java-rpmbuild >= 0:1.5
 BuildRequires:  ant
 BuildRequires:  ant-junit
+BuildRequires:  jakarta-commons-io
 BuildRequires:  junit >= 0:3.8.1
-BuildRequires:  servlet24
-BuildRequires:  servletapi5-javadoc
-Requires:       servletapi5
+BuildRequires:  portlet-1.0-api
+BuildRequires:  servletapi5
 %if %{gcj_support}
 BuildRequires:	java-gcj-compat
 %else
 BuildArch:      noarch
 %endif
+Requires:       servletapi5
 Provides:       %{short_name}
 Obsoletes:      %{short_name}
 
@@ -48,54 +78,51 @@ Group:          Development/Java
 %description    javadoc
 Javadoc for %{name}.
 
-# -----------------------------------------------------------------------------
-
 %prep
 %setup -q -n %{short_name}-%{version}
-%patch0 -p0
-%patch1 -p0
-
-# -----------------------------------------------------------------------------
+%patch0 -b .build.xml
+%patch1 -p0 -b .servletapi5
 
 %build
-export CLASSPATH="$(build-classpath servletapi5 junit \
-jakarta-commons-beanutils):$PWD/target/classes:$PWD/target/test-classes"
-export OPT_JAR_LIST="ant/ant-junit"
+export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
+    servletapi5):${PWD}/target/classes:${PWD}/target/test-classes"
 
-%ant \
-  -Dbuild.sysclasspath=only \
-  -Dfinal.name=%{name}-%{version} \
-  -Dservletapi.javadoc=%{_javadocdir}/servletapi5 \
-  dist
-
-# -----------------------------------------------------------------------------
+%{ant} \
+    -Dbuild.sysclasspath=only \
+    -Dfinal.name=%{name}-%{version} \
+    -Dservletapi.javadoc=%{_javadocdir}/servletapi5 \
+    dist
 
 %install
-rm -rf $RPM_BUILD_ROOT
+%{__rm} -rf $RPM_BUILD_ROOT
 
 # jars
-mkdir -p $RPM_BUILD_ROOT%{_javadir}
-cp -p dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
-(cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed "s|jakarta-||g"`; done)
-(cd $RPM_BUILD_ROOT%{_javadir} && for jar in *-%{version}*; do ln -sf ${jar} `echo $jar| sed "s|-%{version}||g"`; done)
-
+%{__mkdir} -p $RPM_BUILD_ROOT%{_javadir}
+%{__cp} -p dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
+(
+    cd $RPM_BUILD_ROOT%{_javadir} && \
+    for jar in *-%{version}*; do
+        %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|jakarta-||g"`
+    done
+)
+(
+    cd $RPM_BUILD_ROOT%{_javadir} && \
+    for jar in *-%{version}*; do
+        %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|-%{version}||g"`
+    done
+)
 # javadoc
-mkdir -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-cp -pr dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+%{__mkdir} -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+%{__cp} -pr dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+%{__ln_s} %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 # fix end-of-line
 %{__perl} -pi -e 's/\r$//g' *.txt
 
-%if %{gcj_support}
-aot-compile-rpm
-%endif
-
-# -----------------------------------------------------------------------------
+%{gcj_compile}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
-
-# -----------------------------------------------------------------------------
 
 %if %{gcj_support}
 %post
@@ -105,29 +132,13 @@ rm -rf $RPM_BUILD_ROOT
 %{clean_gcjdb}
 %endif
 
-%post javadoc
-rm -f %{_javadocdir}/%{name}
-ln -s %{name}-%{version} %{_javadocdir}/%{name}
-
-%postun javadoc
-if [ "$1" = "0" ]; then
-  rm -f %{_javadocdir}/%{name}
-fi
-
-# -----------------------------------------------------------------------------
-
 %files
 %defattr(0644,root,root,0755)
-%doc LICENSE.txt
+%doc LICENSE.txt NOTICE.txt RELEASE-NOTES.txt
 %{_javadir}/*
-%if %{gcj_support}
-%{_libdir}/gcj/%{name}
-%endif
+%{gcj_files}
 
 %files javadoc
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
-
-# -----------------------------------------------------------------------------
-
-
+%{_javadocdir}/%{name}
