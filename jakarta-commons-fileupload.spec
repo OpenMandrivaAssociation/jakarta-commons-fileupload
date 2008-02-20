@@ -56,7 +56,7 @@ BuildRequires:  junit >= 0:3.8.1
 BuildRequires:  portlet-1.0-api
 BuildRequires:  servletapi5
 %if %{gcj_support}
-BuildRequires:	java-gcj-compat
+BuildRequires:	java-gcj-compat-devel
 %else
 BuildArch:      noarch
 %endif
