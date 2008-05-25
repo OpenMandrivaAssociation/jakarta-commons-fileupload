@@ -28,23 +28,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-%define gcj_support	1
+%define gcj_support	0
 %define base_name fileupload
 %define short_name commons-%{base_name}
 %define section free
 
 Name:           jakarta-%{short_name}
 Epoch:          1
-Version:        1.1.1
-Release:        %mkrel 3.0.1
+Version:        1.2.1
+Release:        %mkrel 0.0.1
 Summary:        Jakarta Commons Fileupload Package
 
 Group:          Development/Java
 License:        Apache License
 URL:            http://jakarta.apache.org/commons/fileupload/
-Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-1.1.1-src.tar.gz
+Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-%{version}-src.tar.gz
 Patch0:         %{name}-build_xml.patch
-Patch1:         %{name}-%{version}-servletapi5.patch
+#Patch1:         %{name}-%{version}-servletapi5.patch
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
@@ -79,9 +79,9 @@ Group:          Development/Java
 Javadoc for %{name}.
 
 %prep
-%setup -q -n %{short_name}-%{version}
+%setup -q -n %{short_name}-%{version}-src
 %patch0 -b .build.xml
-%patch1 -p0 -b .servletapi5
+#%patch1 -p0 -b .servletapi5
 
 %build
 export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
@@ -111,10 +111,16 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
         %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|-%{version}||g"`
     done
 )
+%add_to_maven_depmap %{short_name} %{short_name} %{version} JPP %{short_name}
+
 # javadoc
 %{__mkdir} -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 %{__cp} -pr dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
 %{__ln_s} %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+
+# pom
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
+install -m 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-%{short_name}.pom
 
 # fix end-of-line
 %{__perl} -pi -e 's/\r$//g' *.txt
@@ -124,18 +130,24 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%if %{gcj_support}
 %post
+%update_maven_depmap
+%if %{gcj_support}
 %{update_gcjdb}
+%endif
 
 %postun
+%update_maven_depmap
+%if %{gcj_support}
 %{clean_gcjdb}
 %endif
 
 %files
 %defattr(0644,root,root,0755)
-%doc LICENSE.txt NOTICE.txt RELEASE-NOTES.txt
+%doc LICENSE.txt NOTICE.txt
 %{_javadir}/*
+%{_datadir}/maven2
+%{_mavendepmapfragdir}
 %{gcj_files}
 
 %files javadoc
