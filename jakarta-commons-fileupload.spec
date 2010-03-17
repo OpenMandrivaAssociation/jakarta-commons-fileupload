@@ -36,7 +36,7 @@
 Name:           jakarta-%{short_name}
 Epoch:          1
 Version:        1.2.1
-Release:        %mkrel 2.0.3
+Release:        %mkrel 2.0.4
 Summary:        Jakarta Commons Fileupload Package
 
 Group:          Development/Java
