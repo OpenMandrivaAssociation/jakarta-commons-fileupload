@@ -94,19 +94,19 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
     dist
 
 %install
-%{__rm} -rf $RPM_BUILD_ROOT
+%{__rm} -rf %{buildroot}
 
 # jars
-%{__mkdir} -p $RPM_BUILD_ROOT%{_javadir}
-%{__cp} -p dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
+%{__mkdir} -p %{buildroot}%{_javadir}
+%{__cp} -p dist/%{name}-%{version}.jar %{buildroot}%{_javadir}
 (
-    cd $RPM_BUILD_ROOT%{_javadir} && \
+    cd %{buildroot}%{_javadir} && \
     for jar in *-%{version}*; do
         %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|jakarta-||g"`
     done
 )
 (
-    cd $RPM_BUILD_ROOT%{_javadir} && \
+    cd %{buildroot}%{_javadir} && \
     for jar in *-%{version}*; do
         %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|-%{version}||g"`
     done
@@ -114,13 +114,13 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
 %add_to_maven_depmap %{short_name} %{short_name} %{version} JPP %{short_name}
 
 # javadoc
-%{__mkdir} -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-%{__cp} -pr dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-%{__ln_s} %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
+%{__mkdir} -p %{buildroot}%{_javadocdir}/%{name}-%{version}
+%{__cp} -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}-%{version}
+%{__ln_s} %{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
 
 # pom
-install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
-install -m 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-%{short_name}.pom
+install -d -m 755 %{buildroot}%{_datadir}/maven2/poms
+install -m 644 pom.xml %{buildroot}%{_datadir}/maven2/poms/JPP-%{short_name}.pom
 
 # fix end-of-line
 %{__perl} -pi -e 's/\r$//g' *.txt
@@ -128,7 +128,7 @@ install -m 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-%{short_name}.
 %{gcj_compile}
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %post
 %update_maven_depmap
