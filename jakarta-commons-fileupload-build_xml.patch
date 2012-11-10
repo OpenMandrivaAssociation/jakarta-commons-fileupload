@@ -1,0 +1,35 @@
+--- build.xml.sav	2006-06-08 10:14:30.000000000 +0200
++++ build.xml	2006-10-13 13:13:19.000000000 +0200
+@@ -70,7 +70,7 @@
+       </and>
+     </condition>
+   </target>
+-  <target name="compile" description="o Compile the code" depends="get-deps">
++  <target name="compile" description="o Compile the code">
+     <mkdir dir="${classesdir}">
+     </mkdir>
+     <javac destdir="${classesdir}" deprecation="true" debug="true" optimize="false" excludes="**/package.html">
+@@ -167,7 +167,7 @@
+       </fileset>
+     </copy>
+   </target>
+-  <target name="javadoc" description="o Generate javadoc" depends="get-deps">
++  <target name="javadoc" description="o Generate javadoc">
+     <mkdir dir="${javadocdir}">
+     </mkdir>
+     <tstamp>
+@@ -183,6 +183,7 @@
+         <path refid="build.classpath">
+         </path>
+       </classpath>
++      <link href="${servletapi.javadoc}" />
+     </javadoc>
+   </target>
+   <target name="get-dep-commons-io.jar" description="o Download the dependency : commons-io.jar" unless="commons-io.jar" depends="init,setProxy,noProxy,get-custom-dep-commons-io.jar">
+@@ -254,4 +255,4 @@
+     <unjar dest="${maven.home}" src="${user.home}/maven-install-latest.jar">
+     </unjar>
+   </target>
+-</project>
+\ No newline at end of file
++</project>
