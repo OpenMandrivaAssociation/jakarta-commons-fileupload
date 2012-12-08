@@ -36,7 +36,7 @@
 Name:           jakarta-%{short_name}
 Epoch:          1
 Version:        1.2.1
-Release:        %mkrel 2.0.6
+Release:        2.0.9
 Summary:        Jakarta Commons Fileupload Package
 
 Group:          Development/Java
@@ -44,9 +44,6 @@ License:        Apache License
 URL:            http://jakarta.apache.org/commons/fileupload/
 Source0:        http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-%{version}-src.tar.gz
 Patch0:         %{name}-build_xml.patch
-#Patch1:         %{name}-%{version}-servletapi5.patch
-
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 BuildRequires:  java-rpmbuild >= 0:1.5
 BuildRequires:  ant
@@ -62,7 +59,6 @@ BuildArch:      noarch
 %endif
 Requires:       servletapi5
 Provides:       %{short_name}
-Obsoletes:      %{short_name}
 
 %description
 The javax.servlet package lacks support for rfc 1867, html file
@@ -94,19 +90,19 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
     dist
 
 %install
-%{__rm} -rf %{buildroot}
+%{__rm} -rf $RPM_BUILD_ROOT
 
 # jars
-%{__mkdir} -p %{buildroot}%{_javadir}
-%{__cp} -p dist/%{name}-%{version}.jar %{buildroot}%{_javadir}
+%{__mkdir} -p $RPM_BUILD_ROOT%{_javadir}
+%{__cp} -p dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
 (
-    cd %{buildroot}%{_javadir} && \
+    cd $RPM_BUILD_ROOT%{_javadir} && \
     for jar in *-%{version}*; do
         %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|jakarta-||g"`
     done
 )
 (
-    cd %{buildroot}%{_javadir} && \
+    cd $RPM_BUILD_ROOT%{_javadir} && \
     for jar in *-%{version}*; do
         %{__ln_s} -f ${jar} `echo $jar | %{__sed} "s|-%{version}||g"`
     done
@@ -114,21 +110,18 @@ export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
 %add_to_maven_depmap %{short_name} %{short_name} %{version} JPP %{short_name}
 
 # javadoc
-%{__mkdir} -p %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__cp} -pr dist/docs/api/* %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__ln_s} %{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
+%{__mkdir} -p $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+cp -pr dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
+%{__ln_s} %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name}
 
 # pom
-install -d -m 755 %{buildroot}%{_datadir}/maven2/poms
-install -m 644 pom.xml %{buildroot}%{_datadir}/maven2/poms/JPP-%{short_name}.pom
+install -d -m 755 $RPM_BUILD_ROOT%{_datadir}/maven2/poms
+install -m 644 pom.xml $RPM_BUILD_ROOT%{_datadir}/maven2/poms/JPP-%{short_name}.pom
 
 # fix end-of-line
 %{__perl} -pi -e 's/\r$//g' *.txt
 
 %{gcj_compile}
-
-%clean
-rm -rf %{buildroot}
 
 %post
 %update_maven_depmap
@@ -154,3 +147,83 @@ rm -rf %{buildroot}
 %defattr(0644,root,root,0755)
 %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}
+
+
+%changelog
+* Fri Dec 03 2010 Oden Eriksson <oeriksson@mandriva.com> 1:1.2.1-2.0.5mdv2011.0
++ Revision: 606054
+- rebuild
+
+* Wed Mar 17 2010 Oden Eriksson <oeriksson@mandriva.com> 1:1.2.1-2.0.4mdv2010.1
++ Revision: 522971
+- rebuilt for 2010.1
+
+* Wed Sep 02 2009 Christophe Fergeau <cfergeau@mandriva.com> 1:1.2.1-2.0.3mdv2010.0
++ Revision: 425435
+- rebuild
+
+* Sat Mar 07 2009 Antoine Ginies <aginies@mandriva.com> 1:1.2.1-2.0.2mdv2009.1
++ Revision: 351276
+- rebuild
+
+* Wed Aug 06 2008 Thierry Vignaud <tv@mandriva.org> 1:1.2.1-2.0.1mdv2009.0
++ Revision: 264716
+- rebuild early 2009.0 package (before pixel changes)
+
+* Sun May 25 2008 Alexander Kurtakov <akurtakov@mandriva.org> 1:1.2.1-0.0.1mdv2009.0
++ Revision: 211135
+- new version
+
+* Thu Feb 21 2008 Alexander Kurtakov <akurtakov@mandriva.org> 1:1.1.1-3.0.1mdv2008.1
++ Revision: 173428
+- fix requires
+- new version
+
+  + Thierry Vignaud <tv@mandriva.org>
+    - fix no-buildroot-tag
+    - kill re-definition of %%buildroot on Pixel's request
+
+  + Anssi Hannula <anssi@mandriva.org>
+    - buildrequire java-rpmbuild, i.e. build with icedtea on x86(_64)
+
+* Sun Sep 16 2007 Anssi Hannula <anssi@mandriva.org> 1:1.0-5.5mdv2008.0
++ Revision: 87978
+- use macros for rebuild-gcj-db
+
+* Sat Sep 15 2007 Anssi Hannula <anssi@mandriva.org> 1:1.0-5.4mdv2008.0
++ Revision: 87408
+- rebuild to filter out autorequires of GCJ AOT objects
+- remove unnecessary Requires(post) on java-gcj-compat
+
+* Sun Sep 09 2007 Pascal Terjan <pterjan@mandriva.org> 1:1.0-5.3mdv2008.0
++ Revision: 82853
+- rebuild
+
+
+* Thu Mar 15 2007 Christiaan Welvaart <spturtle@mandriva.org> 1.0-5.2mdv2007.1
++ Revision: 143917
+- rebuild for 2007.1
+- Import jakarta-commons-fileupload
+
+* Sun Jul 23 2006 David Walluck <walluck@mandriva.org> 1:1.0-5.1mdv2006.0
+- bump release
+
+* Fri Jun 02 2006 David Walluck <walluck@mandriva.org> 1:1.0-3.4mdv2006.0
+- rebuild for libgcj.so.7
+
+* Thu Dec 22 2005 David Walluck <walluck@mandriva.org> 1:1.0-3.3mdk
+- export OPT_JAR_LIST
+
+* Fri Nov 11 2005 David Walluck <walluck@mandriva.org> 1:1.0-3.2mdk
+- aot compile
+
+* Sun May 22 2005 David Walluck <walluck@mandriva.org> 1:1.0-3.1mdk
+- release
+
+* Sat Oct 23 2004 Fernando Nasser <fnasser@redhat.com> - 1:1.0-3jpp
+- Patch to build with servletapi5
+- Add missing dependency on ant-junit
+
+* Tue Aug 24 2004 Randy Watler <rwatler at finali.com> - 1:1.0-2jpp
+- Rebuild with ant-1.6.2
+
