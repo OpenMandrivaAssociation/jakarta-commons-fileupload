@@ -28,6 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+%bcond_without	bootstrap
 %define gcj_support	0
 %define base_name fileupload
 %define short_name commons-%{base_name}
@@ -36,7 +37,7 @@
 Name:           jakarta-%{short_name}
 Epoch:          1
 Version:        1.2.1
-Release:        2.0.9
+Release:        2.0.10
 Summary:        Jakarta Commons Fileupload Package
 
 Group:          Development/Java
@@ -47,17 +48,19 @@ Patch0:         %{name}-build_xml.patch
 
 BuildRequires:  java-rpmbuild >= 0:1.5
 BuildRequires:  ant
+%if !%{with bootstrap}
 BuildRequires:  ant-junit
-BuildRequires:  jakarta-commons-io
 BuildRequires:  junit >= 0:3.8.1
+%endif
+BuildRequires:  jakarta-commons-io
 BuildRequires:  portlet-1.0-api
-BuildRequires:  servletapi5
+BuildRequires:  servlet6
 %if %{gcj_support}
 BuildRequires:	java-gcj-compat-devel
 %else
 BuildArch:      noarch
 %endif
-Requires:       servletapi5
+Requires:       servlet6
 Provides:       %{short_name}
 
 %description
@@ -77,24 +80,35 @@ Javadoc for %{name}.
 %prep
 %setup -q -n %{short_name}-%{version}-src
 %patch0 -b .build.xml
-#%patch1 -p0 -b .servletapi5
+#patch1 -p0 -b .servletapi5
 
 %build
-export CLASSPATH="$(build-classpath commons-io junit portlet-1.0-api \
-    servletapi5):${PWD}/target/classes:${PWD}/target/test-classes"
+export CLASSPATH="$(build-classpath commons-io portlet-1.0-api \
+    tomcat6-servlet-2.5-api):${PWD}/target/classes:${PWD}/target/test-classes"
+%if !%{with bootstrap}
+export CLASSPATH="$CLASSPATH:$(build-classpath junit)"
+echo $CLASSPATH
+%endif
 
 %{ant} \
     -Dbuild.sysclasspath=only \
     -Dfinal.name=%{name}-%{version} \
-    -Dservletapi.javadoc=%{_javadocdir}/servletapi5 \
+%if %{with bootstrap}
+    compile jar javadoc
+%else
     dist
+%endif
 
 %install
 %{__rm} -rf $RPM_BUILD_ROOT
 
 # jars
 %{__mkdir} -p $RPM_BUILD_ROOT%{_javadir}
+%if %{with bootstrap}
+%{__cp} -p target/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
+%else
 %{__cp} -p dist/%{name}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
+%endif
 (
     cd $RPM_BUILD_ROOT%{_javadir} && \
     for jar in *-%{version}*; do
