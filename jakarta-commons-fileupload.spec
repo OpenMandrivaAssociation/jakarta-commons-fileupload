@@ -37,12 +37,12 @@
 Summary:	Jakarta Commons Fileupload Package
 Name:		jakarta-%{short_name}
 Epoch:	1
-Version:	1.2.1
-Release:	3
+Version:	1.2.2
+Release:	1
 Group:		Development/Java
 License:	Apache License
 Url:		http://jakarta.apache.org/commons/fileupload/
-Source0:	http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-%{version}-src.tar.gz
+Source0:	http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-1.2.2-src.tar.gz
 Patch0:		%{name}-build_xml.patch
 
 %if !%{gcj_support}
@@ -156,4 +156,5 @@ sed -i -e 's/\r$//g' *.txt
 %files javadoc
 %{_javadocdir}/%{name}-%{version}
 %{_javadocdir}/%{name}
+
 
