@@ -38,7 +38,7 @@ Summary:	Jakarta Commons Fileupload Package
 Name:		jakarta-%{short_name}
 Epoch:	1
 Version:	1.2.1
-Release:	3
+Release:	4
 Group:		Development/Java
 License:	Apache License
 Url:		http://jakarta.apache.org/commons/fileupload/
