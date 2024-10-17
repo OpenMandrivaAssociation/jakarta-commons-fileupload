@@ -41,7 +41,7 @@ Version:	1.2.1
 Release:	3
 Group:		Development/Java
 License:	Apache License
-Url:		http://jakarta.apache.org/commons/fileupload/
+Url:		https://jakarta.apache.org/commons/fileupload/
 Source0:	http://www.apache.org/dist/jakarta/commons/fileupload/source/commons-fileupload-%{version}-src.tar.gz
 Patch0:		%{name}-build_xml.patch
 
